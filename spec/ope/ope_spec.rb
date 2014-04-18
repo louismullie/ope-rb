@@ -5,15 +5,20 @@ describe OPE do
   
   Key = ([0] * 16).pack('C*')
   
-  it "should encrypt and decrypt" do
+  it "should encrypt/decrypt roundtrips" do
     
     cipher = OPE::Cipher.new(Key)
-    
-    n = 1234567
-    a = cipher.encrypt(n)
-    b = cipher.decrypt(a)
-    
-    b.should eql n
+
+    100.times do
+      
+      num = (rand * 20_000).floor
+      
+      enc_num = cipher.encrypt(num)
+      dec_num = cipher.decrypt(enc_num)
+      
+      dec_num.should eql num
+      
+    end
     
   end
   
@@ -27,7 +32,7 @@ describe OPE do
       
       a = cipher.encrypt(num)
       b = cipher.encrypt(num)
-      puts "#{num},#{a}"
+      
       a.should eql b
       
     end
@@ -60,5 +65,5 @@ describe OPE do
     end
       
   end
-
+  
 end
