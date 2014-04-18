@@ -120,8 +120,8 @@ module OPE
         kl = Math.exp(expon)
         
         kr = Math.exp(a - afc(xr-1) -
-          afc(n1-xr+1) - afc(k-xr+1)) -
-          afc(n2-k+xr-1)
+          afc(n1-xr+1) - afc(k-xr+1) -
+          afc(n2-k+xr-1))
         
         lamdl = -Math.log(xl *
           (n2 - k + xl) / (n1 - xl + 1) / (k - xl + 1))
