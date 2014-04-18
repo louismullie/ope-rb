@@ -64,9 +64,6 @@ module OPE
       # Inverse transformation
       elsif m-minjx < 10
         
-        raise 'should not happen in the context of OPE'
-        
-=begin
         w = nil
         
         if k < n2
@@ -75,32 +72,27 @@ module OPE
           w = Math.exp(con + afc(n1) + afc(k) + afc(k-n2) -afc(n1+n2))
         end
         
-        flag_10 = true
-        flag_20 = true
-        
-        while flag_10
+        catch :l10 do
           
-          flag_10 = false
           p = w
           ix = minjx
-          
           u = prng.draw * scale
           
-          while flag_20 && !flag_10
-            flag_20 = false
+          catch :l20 do
+            
             if u > p
               u = u - p
               p = p * (n1-ix)*(k-ix)
               ix = ix + 1
               p = p / ix / (n2-k+ix)
-              flag_10 = true if ix > maxjx
-              flag_20 = true
+              throw :l10 if ix > maxjx
+              throw :l20
             end
+            
           end
           
         end
-=end
-
+        
       # Hypergeometrics-2 points-exponential tails
       else
         
