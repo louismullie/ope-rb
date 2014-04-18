@@ -5,17 +5,31 @@ describe OPE do
   
   Key = ([0] * 16).pack('C*')
   
+  it "should encrypt and decrypt" do
+    
+    cipher = OPE::Cipher.new(Key)
+    
+    n = 1234567
+    a = cipher.encrypt(n)
+    b = cipher.decrypt(a)
+    
+    b.should eql n
+    
+  end
+  
   it "should produce deterministic output" do
     
     cipher = OPE::Cipher.new(Key)
 
     100.times do
+      
       num = (rand * 20_000).floor
       
       a = cipher.encrypt(num)
       b = cipher.encrypt(num)
       puts "#{num},#{a}"
       a.should eql b
+      
     end
 
   end
