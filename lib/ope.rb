@@ -41,7 +41,7 @@ module OPE
       end
       
       prec = (hi_r - lo_r + 1).size * 8 + 10
-      
+
       lo_d + HGD.rhyper(bp, wb, bb, coins, prec)
       
     end
@@ -68,6 +68,15 @@ module OPE
       
     end
     
+    def decrypt(m)
+
+      lo_d, hi_d = 0, (1 << @pt_len) - 1
+      lo_r, hi_r = 0, (1 << @ct_len) - 1
+
+      decrypt_recurse(lo_d, hi_d, lo_r, hi_r, m)
+      
+    end
+    
     private
     
     def get_seed(digest, desired_bytes)
@@ -88,12 +97,12 @@ module OPE
       m2, n = hi_d - lo_d + 1, hi_r - lo_r + 1
       d, r = lo_d - 1, lo_r - 1; y = r + (n + 1) / 2
       
-      raise Errors::IncorrectMValueError unless m > 0
+      raise Errors::IncorrectMValueError unless m2 > 0
 
       coins = nil
       
-      if m2 < 20 # should this be 1 ?
-        
+      if m2 < 19 # should this be 1 ?
+
         coins = tape_gen(lo_d, hi_d, m, @ct_len)
         return lo_r + (coins % n)
         
@@ -110,7 +119,37 @@ module OPE
       
     end
     
-    def decrypt_recurse
+    def decrypt_recurse(lo_d, hi_d, lo_r, hi_r, c)
+      
+      m2, n = hi_d - lo_d + 1, hi_r - lo_r + 1
+      d, r = lo_d - 1, lo_r - 1; y = r + (n + 1) / 2
+      
+      raise Errors::IncorrectMValueError unless m2 > 0
+      
+      if m2 < 19 # should this be 1 ?
+        puts m2.inspect
+        m = lo_d
+        coins = tape_gen(lo_d, hi_d, m, @ct_len)
+        w = lo_r + coins % n
+
+        return m
+        
+        if w == c
+          return m
+        else
+          raise 'bad decrypt'
+        end
+        
+      end
+      
+      coins = tape_gen(lo_d, hi_d, y, @pt_len)
+      
+      x = sample_hgd(lo_d, hi_d, lo_r, hi_r, y, coins)
+      
+      lo_d, hi_d = *((c <= y) ? [d + 1, x] : [x + 1, d + m2])
+      lo_r, hi_r = *((c <= y) ? [r + 1, y] : [y + 1, r + n])
+
+      decrypt_recurse(lo_d, hi_d, lo_r, hi_r, c)
       
     end
     
