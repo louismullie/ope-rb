@@ -101,8 +101,8 @@ module OPE
 
       coins = nil
       
-      if m2 < 19 # should this be 1 ?
-
+      if m2 == 1
+        
         coins = tape_gen(lo_d, hi_d, m, @ct_len)
         return lo_r + (coins % n)
         
@@ -126,19 +126,16 @@ module OPE
       
       raise Errors::IncorrectMValueError unless m2 > 0
       
-      if m2 < 19 # should this be 1 ?
-        puts m2.inspect
-        m = lo_d
+      if m2 == 1
+
+        m = lo_d.to_i
+        
         coins = tape_gen(lo_d, hi_d, m, @ct_len)
         w = lo_r + coins % n
-
-        return m
         
-        if w == c
-          return m
-        else
-          raise 'bad decrypt'
-        end
+        return m.to_i if w == c
+        
+        raise 'bad decrypt'
         
       end
       
