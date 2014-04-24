@@ -10,32 +10,12 @@
  */
 static double afc(int i)
 {
-    static const double al[9] =
-    {
-	0.0,
-	0.0,/*ln(0!)=ln(1)*/
-	0.0,/*ln(1!)=ln(1)*/
-	0.69314718055994530941723212145817,/*ln(2) */
-	1.79175946922805500081247735838070,/*ln(6) */
-	3.17805383034794561964694160129705,/*ln(24)*/
-	4.78749174278204599424770093452324,
-	6.57925121201010099506017829290394,
-	8.52516136106541430016553103634712
-	/*, 10.60460290274525022841722740072165*/
-    };
     double di, value;
-
-    if (i < 0) {
-      printf(("rhyper.c: afc(i), i=%d < 0 -- SHOULD NOT HAPPEN!\n"),
-		      i);
-      return -1;/* unreached (Wall) */
-    } else if (i <= 7) {
-	value = al[i + 1];
-    } else {
+/*
 	di = i;
 	value = (di + 0.5) * log(di) - di + 0.08333333333333 / di
 	    - 0.00277777777777 / di / di / di + 0.9189385332;
-    }
+    }*/
     return value;
 }
 
@@ -74,9 +54,9 @@ static void mp_print_dec(const char* msg, mpq_t a) {
   
 }
 
-mpq_t int_to_rat(mpz_t a) {
+void int_to_rat(mpz_t a, mpq_t rat) {
   
-  char *buf; int len; mpq_t rat;
+  char *buf; int len;
   
   len = mp_int_string_len(&a, 10);
   buf = calloc(len, sizeof(*buf));
@@ -85,9 +65,42 @@ mpq_t int_to_rat(mpz_t a) {
   mp_rat_init(&rat);
   mp_rat_read_string(&rat, 10, buf);
   
-  return rat;
+  return;
   
 } 
+
+static VALUE ope_rb_afc(VALUE self, VALUE num) {
+  
+  mpq_t i; mp_frac_1; mpq_t frac_12; mpq_t frac_pi; mpq_t frac_360;
+  VALUE num_str;
+  mpq_t total;
+  
+  mp_rat_init(&i); mp_rat_init(&frac_1); mp_rat_init(&frac_12);
+  mp_rat_init(&frac_360); mp_rat_init(&frac_pi);
+  mp_rat_init(&total);
+  
+  num_str = rb_funcall(num, rb_intern("to_s"), 0);
+  
+  mp_rat_read_decimal(&i, 10, StringValuePtr(num_str));
+  mp_rat_set_value(&frac_1, 1, 2);
+  mp_rat_set_value(&frac_12, 1, 12);
+  mp_rat_set_value(&frac_360, 1, 360);
+  mp_rat_read_decimal(&frac_pi, 10, "0.9189385332");      // 0.5 * log(2*PI)
+  
+  mp_print_dec("frac_12", frac_12);
+  
+  mp_rat_copy(&i, &total);
+  mp_rat_add(&total, &frac_1, &total);
+  
+  mp_rat_clear(&i); mp_rat_clear(&frac_12);
+  mp_rat_clear(&frac_360); mp_rat_clear(&frac_pi);
+  
+  return self;
+  
+}
+
+/*(di + 0.5) * log(di) - di + 0.08333333333333 / di
+    - 0.00277777777777 / di / di / di + 0.9189385332;*/
 
 static mpz_t rhyper(mpz_t kk, mpz_t nn1, mpz_t nn2, long prec) {
   
@@ -146,15 +159,15 @@ static mpz_t rhyper(mpz_t kk, mpz_t nn1, mpz_t nn2, long prec) {
   mp_print_dec("scale", scale);
   
   if (mp_int_compare(&nn1, &nn2) >= 0) {
-    n1 = int_to_rat(nn2);
-    n2 = int_to_rat(nn1);
+    int_to_rat(nn2, n1);
+    int_to_rat(nn1, n2);
   } else {
-    n1 = int_to_rat(nn1);
-    n2 = int_to_rat(nn2);
+    int_to_rat(nn1, n1);
+    int_to_rat(nn2, n2);
   }
   
   mp_rat_add(&n1, &n2, &tn);
-  kk_dec = int_to_rat(kk);
+  int_to_rat(kk, kk_dec);
   mp_rat_add(&kk_dec, &kk_dec, &kk2);
   
   if (mp_rat_compare(&kk2, &tn) >= 0) {
@@ -464,6 +477,7 @@ void Init_native(void) {
 	
 	ope_rb_hgd = rb_define_class_under(ope_rb, "HGD", rb_cObject);
 	rb_define_singleton_method(ope_rb_hgd, "rhyper_native", ope_rb_rhyper, 5);
+	rb_define_singleton_method(ope_rb_hgd, "afc_native", ope_rb_afc, 1);
 
   return;
 	

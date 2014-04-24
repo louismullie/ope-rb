@@ -78,9 +78,9 @@ module OPE
         w = nil
         
         if k < n2
-          w = Math.exp(con + afc(n2) + afc(n1+n2-k)-afc(n2-k)-afc(n1+n2))
+          w = Math.exp(con + afc_native(n2) + afc_native(n1+n2-k)-afc_native(n2-k)-afc_native(n1+n2))
         else
-          w = Math.exp(con + afc(n1) + afc(k) + afc(k-n2) -afc(n1+n2))
+          w = Math.exp(con + afc_native(n1) + afc_native(k) + afc_native(k-n2) -afc_native(n1+n2))
         end
         
         catch :l10 do
@@ -113,18 +113,18 @@ module OPE
         d = (1.5 * s).floor.to_f + 0.5
         xl = m - d + 0.5
         xr = m + d + 0.5
-        a = afc(m) + afc(n1-m) +
-          afc(k-m) + afc(n2-k+m) 
+        a = afc_native(m) + afc_native(n1-m) +
+          afc_native(k-m) + afc_native(n2-k+m) 
         
-        expon = a - afc(xl) -
-          afc(n1 - xl) - afc(k - xl) -
-          afc(n2 - k + xl)
+        expon = a - afc_native(xl) -
+          afc_native(n1 - xl) - afc_native(k - xl) -
+          afc_native(n2 - k + xl)
         
         kl = Math.exp(expon)
         
-        kr = Math.exp(a - afc(xr-1) -
-          afc(n1-xr+1) - afc(k-xr+1) -
-          afc(n2-k+xr-1))
+        kr = Math.exp(a - afc_native(xr-1) -
+          afc_native(n1-xr+1) - afc_native(k-xr+1) -
+          afc_native(n2-k+xr-1))
         
         lamdl = -Math.log(xl *
           (n2 - k + xl) / (n1 - xl + 1) / (k - xl + 1))
@@ -229,7 +229,7 @@ module OPE
               else  
               
             
-              cand = a - afc(ix) - afc(n1 - ix) - afc(k - ix) - afc(n2 - k + ix)
+              cand = a - afc_native(ix) - afc_native(n1 - ix) - afc_native(k - ix) - afc_native(n2 - k + ix)
               
               if alv <= cand
                 reject = false
@@ -269,6 +269,8 @@ module OPE
     # If i < 9, uses table lookup. Otherwise, uses
     # Stirling's approximation.
     def self.afc(i)
+      
+      puts "i: " + i.inspect
       
       raise 'i should not be < 0' if i < 0
       
