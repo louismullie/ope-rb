@@ -3,6 +3,15 @@ require 'ope'
 
 describe OPE do
   
+  it "should work the HGD" do
+  
+    OPE::HGD.rhyper(5070602400912917605986812821503, 549756130608.0, 10141204801825835000000000000000.0, 15109037923498441947, 10)
+    puts "------------------------"
+    OPE::HGD.rhyper_native('5070602400912917605986812821503', '549756130608', '10141204801825835000000000000000', '15109037923498441947', 10)
+    
+  end
+  
+=begin
   Key = ([0] * 16).pack('C*')
   
   it "should encrypt/decrypt roundtrips" do
@@ -65,5 +74,5 @@ describe OPE do
     end
       
   end
-  
+=end
 end

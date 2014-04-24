@@ -21,6 +21,11 @@ module OPE
     
     def self.rhyper(kk, nn1, nn2, coins, precision)
 
+      puts "kk = #{kk}"
+      puts "nn1 = #{nn1}"
+      puts "nn2 = #{nn2}"
+      # "#{coins}, #{precision}"
+      
       ix = nil
       
       prng = PRNG.new(coins)
@@ -49,6 +54,12 @@ module OPE
       else
         k = kk
       end
+      
+      
+      puts "n1 = #{n1}"
+      puts "n2 = #{n2}"
+      puts "tn = #{tn}"
+      puts "k = #{k}"
       
       m = (k+1.0) * (n1+1.0) / (tn+2.0)
       
