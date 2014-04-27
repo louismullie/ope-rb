@@ -4,13 +4,36 @@ require 'ope'
 describe OPE do
   
   it "should work the HGD" do
-  
-    OPE::HGD.rhyper(5070602400912917605986812821503, 549756130608.0, 10141204801825835000000000000000.0, 15109037923498441947, 10)
-    puts "------------------------"
+    
+    # puts "test: " + OPE::HGD.afc(4343423432).to_s
+    # puts "test2: " + OPE::HGD.afc_native(4343423432).to_s
+    
+    Benchmark.bm { |x| x.report {
+      
+      RubyProf.start
+      
+      a = nil
+      
+      1000.times do 
+      
+        a = OPE::HGD.rhyper(5070602400912917605986812821503, 549756130608.0, 10141204801825835000000000000000.0, 15109037923498441947, 10)
+    
+      end
+      
+      puts a.inspect
+      
+      result = RubyProf.stop
+
+      # Print a flat profile to text
+      printer = RubyProf::FlatPrinter.new(result)
+      printer.print(STDOUT)
+      
+    
+     }}
+     
     # OPE::HGD.rhyper_native('5070602400912917605986812821503', '549756130608', '10141204801825835000000000000000', '15109037923498441947', 10)
     
   end
-  
 =begin
   Key = ([0] * 16).pack('C*')
   

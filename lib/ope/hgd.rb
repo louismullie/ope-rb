@@ -2,18 +2,6 @@ module OPE
   
   class HGD
     
-    AFCTable = [
-      '0.0', # ln(0!) = ln(1)
-      '0.0', # ln(1!) = ln(1)
-      '0.69314718055994530941723212145817', # ln(2!)
-      '1.79175946922805500081247735838070', # ln(3!)
-      '3.17805383034794561964694160129705', # ln(4!)
-      '4.78749174278204599424770093452324', # ln(5!)
-      '6.57925121201010099506017829290394', # ln(6!)
-      '8.52516136106541430016553103634712', # ln(7!)
-      '10.60460290274525022841722740072165' # ln(8!)
-    ].map { |x| BigDecimal.new(x) }
-    
     # Random variates from the hypergeometric distribution.
     # Returns the number of white balls drawn when kk balls
     # are drawn at random from an urn containing nn1 white
@@ -21,9 +9,6 @@ module OPE
     
     def self.rhyper(kk, nn1, nn2, coins, precision)
 
-      puts "kk = #{kk}"
-      puts "nn1 = #{nn1}"
-      puts "nn2 = #{nn2}"
       # "#{coins}, #{precision}"
       
       ix = nil
@@ -55,12 +40,6 @@ module OPE
         k = kk
       end
       
-      
-      puts "n1 = #{n1}"
-      puts "n2 = #{n2}"
-      puts "tn = #{tn}"
-      puts "k = #{k}"
-      
       m = (k+1.0) * (n1+1.0) / (tn+2.0)
       
       minjx = (k - n2 < 0) ? 0 : k - n2
@@ -68,7 +47,7 @@ module OPE
       
       # Degenerate distribution
       if minjx == maxjx
-    
+      
         # no, need to untangle TSL
         return maxjx.floor.to_f
       
@@ -78,26 +57,38 @@ module OPE
         w = nil
         
         if k < n2
-          w = Math.exp(con + afc_native(n2) + afc_native(n1+n2-k)-afc_native(n2-k)-afc_native(n1+n2))
+          w = afc_op_1(con, n1, n2, k)
         else
-          w = Math.exp(con + afc_native(n1) + afc_native(k) + afc_native(k-n2) -afc_native(n1+n2))
+          w = afc_op_2(con, n1, n2, k)
         end
         
-        catch :l10 do
+        count_10 = true
+        
+        while count_10
+          
+          count_10 = false
           
           p = w
           ix = minjx
           u = prng.draw * scale
           
-          catch :l20 do
+          count_20 = true
+          
+          while count_20
+            
+            count_20 = false
             
             if u > p
               u = u - p
               p = p * (n1-ix)*(k-ix)
               ix = ix + 1
               p = p / ix / (n2-k+ix)
-              throw :l10 if ix > maxjx
-              throw :l20
+              if ix > maxjx
+                count_10 = true
+                break
+              end
+              count_20 = true
+              
             end
             
           end
@@ -113,18 +104,13 @@ module OPE
         d = (1.5 * s).floor.to_f + 0.5
         xl = m - d + 0.5
         xr = m + d + 0.5
-        a = afc_native(m) + afc_native(n1-m) +
-          afc_native(k-m) + afc_native(n2-k+m) 
+        a = afc_op_3(m, n1, n2, k)
         
-        expon = a - afc_native(xl) -
-          afc_native(n1 - xl) - afc_native(k - xl) -
-          afc_native(n2 - k + xl)
+        expon = afc_op_4(a, xl, n1, n2, k)
         
         kl = Math.exp(expon)
         
-        kr = Math.exp(a - afc_native(xr-1) -
-          afc_native(n1-xr+1) - afc_native(k-xr+1) -
-          afc_native(n2-k+xr-1))
+        kr = afc_op_5(a, xr, n1, n2, k)
         
         lamdl = -Math.log(xl *
           (n2 - k + xl) / (n1 - xl + 1) / (k - xl + 1))
@@ -136,12 +122,12 @@ module OPE
         p2 = p1 + kl / lamdl
         p3 = p2 + kr / lamdr
         
-        count_30 = 0
+        count_30 = true
         
-        catch :count do
+        while count_30
           
-          count_30 += 1
-
+          count_30 = false
+          
           u = prng.draw * p3
           v = prng.draw
 
@@ -151,12 +137,18 @@ module OPE
           # Left tail region
           elsif u <= p2
             ix = xl + Math.log(v) / lamdl
-            throw :count if ix < minjx
+            if ix < minjx
+              count_30 = true
+              next 
+            end
             v = v * (u - p1) * lamdl
           # Right tail region
           else
             ix = xr - Math.log(v) / lamdr
-            throw :count if ix > maxjx
+            if ix > maxjx
+              count_30 = true
+              next
+            end
             v = v * (u - p2) * lamdr
           end
           
@@ -229,7 +221,7 @@ module OPE
               else  
               
             
-              cand = a - afc_native(ix) - afc_native(n1 - ix) - afc_native(k - ix) - afc_native(n2 - k + ix)
+              cand = afc_op_6(a, ix, n1, n2, k)
               
               if alv <= cand
                 reject = false
@@ -243,7 +235,7 @@ module OPE
           
         end
         
-        throw :count if reject
+        count_30 = true if reject
         
       end
         
@@ -265,24 +257,37 @@ module OPE
       
     end
     
-    # Calculates logarithm of i factorial: ln(i!)
-    # If i < 9, uses table lookup. Otherwise, uses
-    # Stirling's approximation.
+    def self.afc_op_1(con, n1, n2, k)
+      Math.exp(con + afc(n2) + afc(n1+n2-k) - afc(n2-k) - afc(n1+n2))
+    end
+    
+    def self.afc_op_2(con, n1, n2, k)
+      Math.exp(con + afc(n1) + afc(k) + afc(k-n2) - afc(n1+n2))
+    end
+    
+    def self.afc_op_3(m, n1, n2, k)
+      afc_native_op_3(m, n1, n2, k).to_f
+    end
+    
+    def self.afc_op_4(a, xl, n1, n2, k)
+      a - afc(xl) - afc(n1 - xl) - afc(k - xl) - afc(n2 - k + xl)
+    end
+    
+    def self.afc_op_5(a, xr, n1, n2, k)
+      afc_native_op_5(a, xr, n1, n2, k)
+    end
+    
+    def self.afc_op_6(a, ix, n1, n2, k)
+      a - afc(ix) - afc(n1 - ix) - afc(k - ix) - afc(n2 - k + ix)
+    end
+    
     def self.afc(i)
       
-      puts "i: " + i.inspect
-      
-      raise 'i should not be < 0' if i < 0
-      
-      return AFCTable[i] if i <= 8
-      
-      frac_12, frac_360 = 1.0 / 12.0, 1.0 / 360.0
-      frac_pi = 0.5 * Math.log(2 * Math::PI)
-      
-      (i + 0.5) * Math.log(i) - i + frac_12 /
-      i - frac_360 / i / i / i + frac_pi
+      afc_native(i).to_f
       
     end
+    
+    
   
   end
   
