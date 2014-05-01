@@ -2,18 +2,6 @@ module OPE
   
   class HGD
     
-    AFCTable = [
-      '0.0', # ln(0!) = ln(1)
-      '0.0', # ln(1!) = ln(1)
-      '0.69314718055994530941723212145817', # ln(2!)
-      '1.79175946922805500081247735838070', # ln(3!)
-      '3.17805383034794561964694160129705', # ln(4!)
-      '4.78749174278204599424770093452324', # ln(5!)
-      '6.57925121201010099506017829290394', # ln(6!)
-      '8.52516136106541430016553103634712', # ln(7!)
-      '10.60460290274525022841722740072165' # ln(8!)
-    ].map { |x| BigDecimal.new(x) }
-    
     # Random variates from the hypergeometric distribution.
     # Returns the number of white balls drawn when kk balls
     # are drawn at random from an urn containing nn1 white
@@ -255,13 +243,10 @@ module OPE
     end
     
     # Calculates logarithm of i factorial: ln(i!)
-    # If i < 9, uses table lookup. Otherwise, uses
-    # Stirling's approximation.
+    # Uses Stirling's approximation to do so.
     def self.afc(i)
       
       raise 'i should not be < 0' if i < 0
-      
-      return AFCTable[i] if i <= 8
       
       frac_12, frac_360 = 1.0 / 12.0, 1.0 / 360.0
       frac_pi = 0.5 * Math.log(2 * Math::PI)

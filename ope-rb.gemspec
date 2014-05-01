@@ -1,14 +1,14 @@
 $:.push File.expand_path('../lib', __FILE__)
-require 'ope/version'
+require 'ope-rb/version'
 
 Gem::Specification.new do |s|
   
-  s.name        = 'ope'
+  s.name        = 'ope-rb'
   s.version     = OPE::VERSION
   s.authors     = ['Louis Mullie']
   s.email       = ['louis.mullie@gmail.com']
-  s.homepage    = 'https://github.com/symeapp/srp'
-  s.summary     = %q{ Fast C implementation of order-preserving encryption. }
+  s.homepage    = 'https://github.com/cryodex/ope-rb'
+  s.summary     = %q{ A Ruby implementation of order-preserving encryption }
   s.description = %q{  }
 
   s.files = Dir.glob('lib/**/*.rb') +

@@ -1,9 +1,9 @@
-require 'ope/native'
-require 'ope/version'
-require 'ope/prng'
-require 'ope/hgd'
-require 'ope/crypto'
-require 'ope/errors'
+require 'ope-rb/native'
+require 'ope-rb/version'
+require 'ope-rb/prng'
+require 'ope-rb/hgd'
+require 'ope-rb/crypto'
+require 'ope-rb/errors'
 
 module OPE
   
@@ -135,7 +135,7 @@ module OPE
         
         return m.to_i if w == c
         
-        raise 'bad decrypt'
+        raise Errors::BadDecryptError
         
       end
       

@@ -1,11 +1,7 @@
 module OPE
   
   module Crypto
-    
-    # Hash of concatenated arguments with the
-    # concatenated values of each of their lengths
-    # represented as unsigned 32-bit integers.
-    # Ensures unambiguous boundary between strings.
+
     def hash_concat(*args)
       
       lens = args.map { |arg| [1].pack("L") }
@@ -27,7 +23,9 @@ module OPE
     end
     
     def cipher_encrypt(data)
+      
       @cipher.update(data) + @cipher.final
+      
     end
   
   end

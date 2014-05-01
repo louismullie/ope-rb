@@ -1,5 +1,5 @@
 require 'spec_helper'
-require 'ope'
+require 'ope-rb'
 
 describe OPE do
   

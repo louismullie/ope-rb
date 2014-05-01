@@ -13,7 +13,7 @@ task :make => [:clean] do
     ruby 'extconf.rb'
     sh 'make'
   end
-  cp 'ext/ope/native.bundle', 'lib/ope'
+  cp 'ext/ope/native.bundle', 'lib/ope-rb'
 end
 
 CLEAN.include('ext/**/*{.o,.log,.so,.bundle}')

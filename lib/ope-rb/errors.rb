@@ -41,7 +41,15 @@ module OPE
       end
     
     end
-  
+    
+    class BadDecryptError < StandardError
+    
+      def initialize
+        super('Decryption failed')
+      end
+    
+    end
+    
   end
   
 end
