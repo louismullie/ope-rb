@@ -3,10 +3,10 @@ module OPE
   class HGD
     
     # Random variates from the hypergeometric distribution.
+    #
     # Returns the number of white balls drawn when kk balls
     # are drawn at random from an urn containing nn1 white
     # and nn2 black balls.
-    
     def self.rhyper(kk, nn1, nn2, coins, precision)
 
       ix = nil
@@ -146,17 +146,26 @@ module OPE
             if m < ix
               
               i = m + 1
+              
               while i < ix # <= ?
-                f = f * (n1 - i + 1.0) * (k - i + 1.0) / (n2 - k + i) / i
+                
+                f = f * (n1 - i + 1.0) *
+                        (k - i + 1.0) /
+                        (n2 - k + i) / i
                 i += 1
+                
               end
               
             elsif m > ix
               
               i = ix + 1
+              
               while i < m # <= ?
-                f = f * i * (n2 - k + i) / (n1 - i) / (k - i) # + 1 ?
+                
+                f = f * i * (n2 - k + i) /
+                    (n1 - i) / (k - i) # + 1 ?
                 i += 1
+                
               end
               
             end
@@ -206,13 +215,10 @@ module OPE
               else  
               
             
-              cand = a - afc(ix) - afc(n1 - ix) - afc(k - ix) - afc(n2 - k + ix)
+              cand = a - afc(ix) - afc(n1 - ix) -
+              afc(k - ix) - afc(n2 - k + ix)
               
-              if alv <= cand
-                reject = false
-              else
-                reject = true
-              end
+              reject = alv > cand
             
             end
           
