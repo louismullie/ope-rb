@@ -1,4 +1,4 @@
-require 'ope-rb/native'
+require 'ope/native'
 require 'ope-rb/version'
 require 'ope-rb/prng'
 require 'ope-rb/hgd'
