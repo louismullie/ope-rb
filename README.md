@@ -21,4 +21,4 @@ puts b > a     # =>  true
 
 ### License
 
-This software is released under the GNU Affero General Public License. If this license does not suit your needs, please contact me.
+This software is released under the GNU Affero General Public License.
